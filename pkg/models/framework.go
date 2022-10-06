@@ -31,7 +31,7 @@ type DataMapWriter interface {
 type Framework struct {
 	Release  Release   `yaml:"release"`
 	Prefixes []Prefix  `yaml:"prefixes"`
-	Packages []Package `yaml:"packages"`
+	Packages []Package `yaml:"packages,omitempty"`
 }
 
 func (f *Framework) GetPrefixMap() map[string]string {

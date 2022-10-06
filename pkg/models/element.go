@@ -23,9 +23,9 @@ import (
 
 type Element struct {
 	Name        string     `yaml:"name"`
-	Tags        []string   `yaml:"tags"`
-	Fields      []Field    `yaml:"fields"`
-	Expressions Expression `yaml:"expressions"`
+	Tags        []string   `yaml:"tags,omitempty"`
+	Fields      []Field    `yaml:"fields,omitempty"`
+	Expressions Expression `yaml:"expressions,omitempty"`
 }
 
 func (e *Element) GetFullName(moduleName string) string {

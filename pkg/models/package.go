@@ -23,7 +23,7 @@ import (
 
 type Package struct {
 	Name    string   `yaml:"name"`
-	Modules []Module `yaml:"modules"`
+	Modules []Module `yaml:"modules,omitempty"`
 }
 
 func (p *Package) GetElements() (map[string]string, error) {

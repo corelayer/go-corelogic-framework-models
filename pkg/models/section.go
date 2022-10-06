@@ -23,7 +23,7 @@ import (
 
 type Section struct {
 	Name     string    `yaml:"name"`
-	Elements []Element `yaml:"elements"`
+	Elements []Element `yaml:"elements,omitempty"`
 }
 
 func (s *Section) GetFullName(moduleName string) string {
@@ -45,7 +45,7 @@ func (s *Section) GetElements(moduleName string) (map[string]string, error) {
 			err = fmt.Errorf("duplicate key in fields: %q", elementOutputName)
 			break
 		} else {
-			output[elementOutputName] = elementOutputName
+			output[elementOutputName] = e.Name
 		}
 	}
 

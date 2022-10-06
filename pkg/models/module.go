@@ -23,8 +23,8 @@ import (
 
 type Module struct {
 	Name     string    `yaml:"name"`
-	Tags     []string  `yaml:"tags"`
-	Sections []Section `yaml:"sections"`
+	Tags     []string  `yaml:"tags,omitempty"`
+	Sections []Section `yaml:"sections,omitempty"`
 }
 
 func (m *Module) GetFullModuleName(packageName string) string {
