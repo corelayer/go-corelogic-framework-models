@@ -29,7 +29,3 @@ type Release struct {
 func (r *Release) GetVersionAsString() string {
 	return fmt.Sprintf("_CL%d_%d_%d_", r.Major, r.Minor, r.Patch)
 }
-
-func (r *Release) GetSemanticVersion() string {
-	return fmt.Sprintf("%d.%d.%d", r.Major, r.Minor, r.Patch)
-}

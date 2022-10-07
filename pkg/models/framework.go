@@ -31,18 +31,23 @@ type Framework struct {
 	Packages []Package `yaml:"packages,omitempty"`
 }
 
-func (f *Framework) GetPrefixMap() map[string]string {
-	result := make(map[string]string)
-
-	for _, v := range f.Prefixes {
-		result[v.Section] = v.Prefix
-	}
-
-	return result
+func (f *Framework) GetPrefixWithVersion(section string) string {
+	return strings.Join([]string{section, f.Release.GetVersionAsString()}, "_")
 }
 
-func (f *Framework) GetPrefixWithVersion(sectionName string) string {
-	return strings.Join([]string{f.GetPrefixMap()[sectionName], f.Release.GetVersionAsString()}, "_")
+func (f *Framework) GetPrefixes() (map[string]Prefix, error) {
+	output := make(map[string]Prefix)
+	var err error
+
+	for _, prefix := range f.Prefixes {
+		prefix.Prefix = f.GetPrefixWithVersion(prefix.Section)
+		output, err = AppendPrefixes(output, prefix)
+		if err != nil {
+			break
+		}
+	}
+
+	return output, err
 }
 
 func (f *Framework) GetElements() (map[string]Element, error) {

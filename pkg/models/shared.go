@@ -21,6 +21,18 @@ import (
 	"strings"
 )
 
+func AppendPrefixes(destination map[string]Prefix, source Prefix) (map[string]Prefix, error) {
+	var err error
+
+	if _, isMapContainsKey := destination[source.Section]; isMapContainsKey {
+		err = fmt.Errorf("duplicate key %q found in framework", source.Section)
+	} else {
+		destination[source.Section] = source
+	}
+
+	return destination, err
+}
+
 func AppendElements(destination map[string]Element, source map[string]Element) (map[string]Element, error) {
 	var err error
 
@@ -51,28 +63,52 @@ func AppendFields(destination map[string]string, source map[string]string) (map[
 	return destination, err
 }
 
-func UnfoldFields(fields map[string]string) map[string]string {
+func UnfoldFields(fields map[string]string, prefixes map[string]Prefix) map[string]string {
+	fields = unfoldFieldData(fields)
+	fields = unfoldPrefixes(fields, prefixes)
+
+	return fields
+}
+
+func unfoldFieldData(fields map[string]string) map[string]string {
 	re := regexp.MustCompile(`<<[a-zA-Z0-9_.]*/[a-zA-Z0-9_]*>>`)
 	for key := range fields {
-		fmt.Println(fields[key])
 		loop := true
 		for loop {
 			foundKeys := re.FindAllString(fields[key], -1)
 			for _, foundKey := range foundKeys {
-				fmt.Println(foundKey)
 				searchKey := strings.ReplaceAll(foundKey, "<<", "")
 				searchKey = strings.ReplaceAll(searchKey, ">>", "")
-				fmt.Println(searchKey)
 				fields[key] = strings.ReplaceAll(fields[key], foundKey, fields[searchKey])
-				fmt.Println(fields[key])
 			}
 
 			if !re.MatchString(fields[key]) {
 				loop = false
 			}
 		}
-		fmt.Println("-----------------------")
 	}
 
 	return fields
+}
+
+func unfoldPrefixes(fields map[string]string, prefixes map[string]Prefix) map[string]string {
+	re := regexp.MustCompile(`<<[a-zA-Z0-9_.]*>>`)
+	for key := range fields {
+		loop := true
+		for loop {
+			foundKeys := re.FindAllString(fields[key], -1)
+			for _, foundKey := range foundKeys {
+				searchKey := strings.ReplaceAll(foundKey, "<<", "")
+				searchKey = strings.ReplaceAll(searchKey, ">>", "")
+				fields[key] = strings.ReplaceAll(fields[key], foundKey, prefixes[searchKey].Prefix)
+			}
+
+			if !re.MatchString(fields[key]) {
+				loop = false
+			}
+		}
+	}
+
+	return fields
+
 }
