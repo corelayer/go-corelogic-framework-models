@@ -54,19 +54,24 @@ func AppendFields(destination map[string]string, source map[string]string) (map[
 func UnfoldFields(fields map[string]string) map[string]string {
 	re := regexp.MustCompile(`<<[a-zA-Z0-9_.]*/[a-zA-Z0-9_]*>>`)
 	for key := range fields {
+		fmt.Println(fields[key])
 		loop := true
 		for loop {
 			foundKeys := re.FindAllString(fields[key], -1)
 			for _, foundKey := range foundKeys {
+				fmt.Println(foundKey)
 				searchKey := strings.ReplaceAll(foundKey, "<<", "")
 				searchKey = strings.ReplaceAll(searchKey, ">>", "")
+				fmt.Println(searchKey)
 				fields[key] = strings.ReplaceAll(fields[key], foundKey, fields[searchKey])
+				fmt.Println(fields[key])
 			}
 
 			if !re.MatchString(fields[key]) {
 				loop = false
 			}
 		}
+		fmt.Println("-----------------------")
 	}
 
 	return fields
