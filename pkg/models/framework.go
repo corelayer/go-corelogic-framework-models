@@ -18,10 +18,9 @@ package models
 
 import (
 	"fmt"
-	"log"
+	"regexp"
 	"sort"
 	"strings"
-	//"github.com/corelayer/corelogic/general"
 )
 
 type DataMapWriter interface {
@@ -54,7 +53,7 @@ func (f *Framework) appendData(destination map[string]interface{}, source map[st
 	for k, v := range source {
 		if _, isMapContainsKey := destination[k]; isMapContainsKey {
 			err = fmt.Errorf("duplicate key %q found in framework", k)
-			log.Fatal(err)
+			break
 		} else {
 			destination[k] = v
 		}
@@ -75,14 +74,12 @@ func (f *Framework) GetElements() (map[string]interface{}, error) {
 
 		elements, err = p.GetElements()
 		if err != nil {
-			log.Fatal(err)
-			//break
+			break
 		}
 
 		output, err = f.appendData(output, elements)
 		if err != nil {
-			log.Fatal(err)
-			//break
+			break
 		}
 	}
 	return output, err
@@ -100,17 +97,36 @@ func (f *Framework) GetFields() (map[string]interface{}, error) {
 
 		fields, err = p.GetFields()
 		if err != nil {
-			log.Fatal(err)
-			//break
+			break
 		}
 
 		output, err = f.appendData(output, fields)
 		if err != nil {
-			log.Fatal(err)
-			//break
+			break
 		}
 	}
 	return output, err
+}
+
+func (c *Framework) UnfoldFields(fields map[string]string) map[string]string {
+	re := regexp.MustCompile(`<<[a-zA-Z0-9_.]*/[a-zA-Z0-9_]*>>`)
+	for key := range fields {
+		loop := true
+		for loop {
+			foundKeys := re.FindAllString(fields[key], -1)
+			for _, foundKey := range foundKeys {
+				searchKey := strings.ReplaceAll(foundKey, "<<", "")
+				searchKey = strings.ReplaceAll(searchKey, ">>", "")
+				fields[key] = strings.ReplaceAll(fields[key], foundKey, fields[searchKey])
+			}
+
+			if !re.MatchString(fields[key]) {
+				loop = false
+			}
+		}
+	}
+
+	return fields
 }
 
 func (f *Framework) GetExpressions(kind string, tagFilter []string) (map[string]interface{}, error) {
@@ -136,10 +152,14 @@ func (f *Framework) getInstallExpressions(tagFilter []string) (map[string]interf
 	for _, p := range f.Packages {
 		expressions, err = p.GetInstallExpressions(tagFilter)
 		if err != nil {
-			log.Fatal(err)
-		} else {
-			output, err = f.appendData(output, expressions)
+			break
 		}
+
+		output, err = f.appendData(output, expressions)
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err
@@ -155,10 +175,14 @@ func (f *Framework) getUninstallExpressions(tagFilter []string) (map[string]inte
 	for _, p := range f.Packages {
 		expressions, err = p.GetUninstallExpressions(tagFilter)
 		if err != nil {
-			log.Fatal(err)
-		} else {
-			output, err = f.appendData(output, expressions)
+			break
 		}
+
+		output, err = f.appendData(output, expressions)
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err

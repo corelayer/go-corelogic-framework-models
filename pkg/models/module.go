@@ -41,13 +41,18 @@ func (m *Module) GetElements(packageName string) (map[string]interface{}, error)
 		expressions, err = s.GetElements(fullModuleName)
 		if err != nil {
 			break
-		} else {
-			output, err = m.appendData(output, expressions)
 		}
+
+		output, err = m.appendData(output, expressions)
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err
 }
+
 func (m *Module) GetFields(packageName string) (map[string]interface{}, error) {
 	output := make(map[string]interface{})
 	var expressions map[string]interface{}
@@ -58,8 +63,11 @@ func (m *Module) GetFields(packageName string) (map[string]interface{}, error) {
 		expressions, err = s.GetFields(fullModuleName)
 		if err != nil {
 			break
-		} else {
-			output, err = m.appendData(output, expressions)
+		}
+
+		output, err = m.appendData(output, expressions)
+		if err != nil {
+			break
 		}
 	}
 
@@ -74,13 +82,16 @@ func (m *Module) GetInstallExpressions(packageName string, tagFilter []string) (
 	if !m.HasFilteredTag(tagFilter) {
 		fullModuleName := m.GetFullModuleName(packageName)
 		for _, s := range m.Sections {
-			// log.Println(s.Name)
 			expressions, err = s.GetInstallExpressions(fullModuleName, tagFilter)
 			if err != nil {
 				break
-			} else {
-				output, err = m.appendData(output, expressions)
 			}
+
+			output, err = m.appendData(output, expressions)
+			if err != nil {
+				break
+			}
+
 		}
 	}
 
@@ -98,9 +109,13 @@ func (m *Module) GetUninstallExpressions(packageName string, tagFilter []string)
 			expressions, err = s.GetUninstallExpressions(fullModuleName, tagFilter)
 			if err != nil {
 				break
-			} else {
-				output, err = m.appendData(output, expressions)
 			}
+
+			output, err = m.appendData(output, expressions)
+			if err != nil {
+				break
+			}
+
 		}
 	} else {
 		log.Printf("Skipping module %s", m.GetFullModuleName(packageName))
@@ -131,7 +146,6 @@ func (m *Module) HasFilteredTag(tagFilter []string) bool {
 		for _, f := range tagFilter {
 			if t == f {
 				filterModule = true
-				// log.Printf("Skipping module %s for tag %s", m.GetFullModuleName(packageName), t)
 				break
 			}
 		}

@@ -44,9 +44,13 @@ func (s *Section) GetElements(moduleName string) (map[string]interface{}, error)
 		if _, isMapContainsKey := output[elementOutputName]; isMapContainsKey {
 			err = fmt.Errorf("duplicate key in fields: %q", elementOutputName)
 			break
-		} else {
-			output[elementOutputName] = e
 		}
+
+		output[elementOutputName] = e
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err
@@ -63,9 +67,16 @@ func (s *Section) GetFields(moduleName string) (map[string]interface{}, error) {
 			if _, isMapContainsKey := output[outputKey]; isMapContainsKey {
 				err = fmt.Errorf("duplicate key in fields: %q", outputKey)
 				break
-			} else {
-				output[outputKey] = s.expandSectionPrefix(f.Data)
 			}
+
+			output[outputKey] = s.expandSectionPrefix(f.Data)
+			if err != nil {
+				break
+			}
+
+		}
+		if err != nil {
+			break
 		}
 	}
 
@@ -84,15 +95,15 @@ func (s *Section) GetInstallExpressions(moduleName string, tagFilter []string) (
 
 			if err != nil {
 				break
-			} else {
-				if _, isMapContainsKey := output[outputKey]; isMapContainsKey {
-					//key exist
-					err = fmt.Errorf("duplicate key in section: %q", outputKey)
-					break
-				} else {
-					output[outputKey] = s.expandSectionPrefix(outputValue)
-				}
 			}
+
+			if _, isMapContainsKey := output[outputKey]; isMapContainsKey {
+				//key exist
+				err = fmt.Errorf("duplicate key in section: %q", outputKey)
+				break
+			}
+
+			output[outputKey] = s.expandSectionPrefix(outputValue)
 		}
 	}
 
@@ -111,15 +122,15 @@ func (s *Section) GetUninstallExpressions(moduleName string, tagFilter []string)
 
 			if err != nil {
 				break
-			} else {
-				if _, isMapContainsKey := output[outputKey]; isMapContainsKey {
-					//key exist
-					err = fmt.Errorf("duplicate key in section: %q", outputKey)
-					break
-				} else {
-					output[outputKey] = s.expandSectionPrefix(outputValue)
-				}
 			}
+
+			if _, isMapContainsKey := output[outputKey]; isMapContainsKey {
+				//key exist
+				err = fmt.Errorf("duplicate key in section: %q", outputKey)
+				break
+			}
+
+			output[outputKey] = s.expandSectionPrefix(outputValue)
 		}
 	}
 

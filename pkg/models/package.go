@@ -18,7 +18,6 @@ package models
 
 import (
 	"fmt"
-	"log"
 )
 
 type Package struct {
@@ -35,8 +34,11 @@ func (p *Package) GetElements() (map[string]interface{}, error) {
 		elements, err = m.GetElements(p.Name)
 		if err != nil {
 			break
-		} else {
-			output, err = p.appendData(output, elements)
+		}
+
+		output, err = p.appendData(output, elements)
+		if err != nil {
+			break
 		}
 	}
 
@@ -52,9 +54,13 @@ func (p *Package) GetFields() (map[string]interface{}, error) {
 		fields, err = m.GetFields(p.Name)
 		if err != nil {
 			break
-		} else {
-			output, err = p.appendData(output, fields)
 		}
+
+		output, err = p.appendData(output, fields)
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err
@@ -69,9 +75,13 @@ func (p *Package) GetInstallExpressions(tagFilter []string) (map[string]interfac
 		expressions, err = m.GetInstallExpressions(p.Name, tagFilter)
 		if err != nil {
 			break
-		} else {
-			output, err = p.appendData(output, expressions)
 		}
+
+		output, err = p.appendData(output, expressions)
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err
@@ -86,9 +96,13 @@ func (p *Package) GetUninstallExpressions(tagFilter []string) (map[string]interf
 		expressions, err = m.GetUninstallExpressions(p.Name, tagFilter)
 		if err != nil {
 			break
-		} else {
-			output, err = p.appendData(output, expressions)
 		}
+
+		output, err = p.appendData(output, expressions)
+		if err != nil {
+			break
+		}
+
 	}
 
 	return output, err
@@ -100,7 +114,7 @@ func (p *Package) appendData(destination map[string]interface{}, source map[stri
 	for k, v := range source {
 		if _, isMapContainsKey := destination[k]; isMapContainsKey {
 			err = fmt.Errorf("duplicate key %q found in package %q", k, p.Name)
-			log.Fatal(err)
+			break
 		} else {
 			destination[k] = v
 		}
