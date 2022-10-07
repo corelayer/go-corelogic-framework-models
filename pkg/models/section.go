@@ -34,8 +34,8 @@ func (s *Section) expandSectionPrefix(expression string) string {
 	return strings.ReplaceAll(expression, "prefix", s.Name)
 }
 
-func (s *Section) GetElements(moduleName string) (map[string]interface{}, error) {
-	output := make(map[string]interface{})
+func (s *Section) GetElements(moduleName string) (map[string]Element, error) {
+	output := make(map[string]Element)
 	var err error
 
 	for _, e := range s.Elements {
@@ -56,8 +56,8 @@ func (s *Section) GetElements(moduleName string) (map[string]interface{}, error)
 	return output, err
 }
 
-func (s *Section) GetFields(moduleName string) (map[string]interface{}, error) {
-	output := make(map[string]interface{})
+func (s *Section) GetFields(moduleName string) (map[string]string, error) {
+	output := make(map[string]string)
 	var err error
 
 	for _, e := range s.Elements {

@@ -25,9 +25,9 @@ type Package struct {
 	Modules []Module `yaml:"modules,omitempty"`
 }
 
-func (p *Package) GetElements() (map[string]interface{}, error) {
-	output := make(map[string]interface{})
-	var elements map[string]interface{}
+func (p *Package) GetElements() (map[string]Element, error) {
+	output := make(map[string]Element)
+	var elements map[string]Element
 	var err error
 
 	for _, m := range p.Modules {
@@ -35,8 +35,7 @@ func (p *Package) GetElements() (map[string]interface{}, error) {
 		if err != nil {
 			break
 		}
-
-		output, err = p.appendData(output, elements)
+		output, err = AppendElements(output, elements)
 		if err != nil {
 			break
 		}
@@ -45,9 +44,9 @@ func (p *Package) GetElements() (map[string]interface{}, error) {
 	return output, err
 }
 
-func (p *Package) GetFields() (map[string]interface{}, error) {
-	output := make(map[string]interface{})
-	var fields map[string]interface{}
+func (p *Package) GetFields() (map[string]string, error) {
+	output := make(map[string]string)
+	var fields map[string]string
 	var err error
 
 	for _, m := range p.Modules {
@@ -55,12 +54,10 @@ func (p *Package) GetFields() (map[string]interface{}, error) {
 		if err != nil {
 			break
 		}
-
-		output, err = p.appendData(output, fields)
+		output, err = AppendFields(output, fields)
 		if err != nil {
 			break
 		}
-
 	}
 
 	return output, err

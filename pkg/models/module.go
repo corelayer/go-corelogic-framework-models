@@ -31,19 +31,19 @@ func (m *Module) GetFullModuleName(packageName string) string {
 	return packageName + "." + m.Name
 }
 
-func (m *Module) GetElements(packageName string) (map[string]interface{}, error) {
-	output := make(map[string]interface{})
-	var expressions map[string]interface{}
+func (m *Module) GetElements(packageName string) (map[string]Element, error) {
+	output := make(map[string]Element)
+	var elements map[string]Element
 	var err error
 
 	fullModuleName := m.GetFullModuleName(packageName)
 	for _, s := range m.Sections {
-		expressions, err = s.GetElements(fullModuleName)
+		elements, err = s.GetElements(fullModuleName)
 		if err != nil {
 			break
 		}
 
-		output, err = m.appendData(output, expressions)
+		output, err = AppendElements(output, elements)
 		if err != nil {
 			break
 		}
@@ -53,19 +53,18 @@ func (m *Module) GetElements(packageName string) (map[string]interface{}, error)
 	return output, err
 }
 
-func (m *Module) GetFields(packageName string) (map[string]interface{}, error) {
-	output := make(map[string]interface{})
-	var expressions map[string]interface{}
+func (m *Module) GetFields(packageName string) (map[string]string, error) {
+	output := make(map[string]string)
+	var fields map[string]string
 	var err error
 
 	fullModuleName := m.GetFullModuleName(packageName)
 	for _, s := range m.Sections {
-		expressions, err = s.GetFields(fullModuleName)
+		fields, err = s.GetFields(fullModuleName)
 		if err != nil {
 			break
 		}
-
-		output, err = m.appendData(output, expressions)
+		output, err = AppendFields(output, fields)
 		if err != nil {
 			break
 		}

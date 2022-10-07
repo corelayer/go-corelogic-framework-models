@@ -17,8 +17,6 @@
 package models
 
 import (
-	"fmt"
-	"regexp"
 	"sort"
 	"strings"
 )
@@ -47,146 +45,103 @@ func (f *Framework) GetPrefixWithVersion(sectionName string) string {
 	return strings.Join([]string{f.GetPrefixMap()[sectionName], f.Release.GetVersionAsString()}, "_")
 }
 
-func (f *Framework) appendData(destination map[string]interface{}, source map[string]interface{}) (map[string]interface{}, error) {
+func (f *Framework) GetElements() (map[string]Element, error) {
+	output := make(map[string]Element)
+	var elements map[string]Element
 	var err error
 
-	for k, v := range source {
-		if _, isMapContainsKey := destination[k]; isMapContainsKey {
-			err = fmt.Errorf("duplicate key %q found in framework", k)
-			break
-		} else {
-			destination[k] = v
-		}
-	}
-
-	return destination, err
-}
-
-func (f *Framework) GetElements() (map[string]interface{}, error) {
-	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get fields from packages"))
-
-	output := make(map[string]interface{})
-	var err error
-
-	// Get all fields in all packages
 	for _, p := range f.Packages {
-		var elements map[string]interface{}
-
 		elements, err = p.GetElements()
 		if err != nil {
 			break
 		}
-
-		output, err = f.appendData(output, elements)
+		output, err = AppendElements(output, elements)
 		if err != nil {
 			break
 		}
 	}
+
 	return output, err
 }
 
-func (f *Framework) GetFields() (map[string]interface{}, error) {
-	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get fields from packages"))
-
-	output := make(map[string]interface{})
+func (f *Framework) GetFields() (map[string]string, error) {
+	output := make(map[string]string)
+	var fields map[string]string
 	var err error
 
-	// Get all fields in all packages
 	for _, p := range f.Packages {
-		var fields map[string]interface{}
-
 		fields, err = p.GetFields()
 		if err != nil {
 			break
 		}
-
-		output, err = f.appendData(output, fields)
+		output, err = AppendFields(output, fields)
 		if err != nil {
 			break
 		}
-	}
-	return output, err
-}
-
-func (c *Framework) UnfoldFields(fields map[string]string) map[string]string {
-	re := regexp.MustCompile(`<<[a-zA-Z0-9_.]*/[a-zA-Z0-9_]*>>`)
-	for key := range fields {
-		loop := true
-		for loop {
-			foundKeys := re.FindAllString(fields[key], -1)
-			for _, foundKey := range foundKeys {
-				searchKey := strings.ReplaceAll(foundKey, "<<", "")
-				searchKey = strings.ReplaceAll(searchKey, ">>", "")
-				fields[key] = strings.ReplaceAll(fields[key], foundKey, fields[searchKey])
-			}
-
-			if !re.MatchString(fields[key]) {
-				loop = false
-			}
-		}
-	}
-
-	return fields
-}
-
-func (f *Framework) GetExpressions(kind string, tagFilter []string) (map[string]interface{}, error) {
-	output := make(map[string]interface{})
-	var err error
-
-	if kind == "install" {
-		output, err = f.getInstallExpressions(tagFilter)
-	} else if kind == "uninstall" {
-		output, err = f.getUninstallExpressions(tagFilter)
 	}
 
 	return output, err
 }
 
-func (f *Framework) getInstallExpressions(tagFilter []string) (map[string]interface{}, error) {
-	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get install expressions from packages"))
+//
+//func (f *Framework) GetExpressions(kind string, tagFilter []string) (map[string]interface{}, error) {
+//	output := make(map[string]interface{})
+//	var err error
+//
+//	if kind == "install" {
+//		output, err = f.getInstallExpressions(tagFilter)
+//	} else if kind == "uninstall" {
+//		output, err = f.getUninstallExpressions(tagFilter)
+//	}
+//
+//	return output, err
+//}
 
-	output := make(map[string]interface{})
-	var expressions map[string]interface{}
-	var err error
-
-	for _, p := range f.Packages {
-		expressions, err = p.GetInstallExpressions(tagFilter)
-		if err != nil {
-			break
-		}
-
-		output, err = f.appendData(output, expressions)
-		if err != nil {
-			break
-		}
-
-	}
-
-	return output, err
-}
-
-func (f *Framework) getUninstallExpressions(tagFilter []string) (map[string]interface{}, error) {
-	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get uninstall expressions from packages"))
-
-	output := make(map[string]interface{})
-	var expressions map[string]interface{}
-	var err error
-
-	for _, p := range f.Packages {
-		expressions, err = p.GetUninstallExpressions(tagFilter)
-		if err != nil {
-			break
-		}
-
-		output, err = f.appendData(output, expressions)
-		if err != nil {
-			break
-		}
-
-	}
-
-	return output, err
-}
+//func (f *Framework) getInstallExpressions(tagFilter []string) (map[string]interface{}, error) {
+//	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get install expressions from packages"))
+//
+//	output := make(map[string]interface{})
+//	var expressions map[string]interface{}
+//	var err error
+//
+//	for _, p := range f.Packages {
+//		expressions, err = p.GetInstallExpressions(tagFilter)
+//		if err != nil {
+//			break
+//		}
+//
+//		output, err = f.appendData(output, expressions)
+//		if err != nil {
+//			break
+//		}
+//
+//	}
+//
+//	return output, err
+//}
+//
+//func (f *Framework) getUninstallExpressions(tagFilter []string) (map[string]interface{}, error) {
+//	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get uninstall expressions from packages"))
+//
+//	output := make(map[string]interface{})
+//	var expressions map[string]interface{}
+//	var err error
+//
+//	for _, p := range f.Packages {
+//		expressions, err = p.GetUninstallExpressions(tagFilter)
+//		if err != nil {
+//			break
+//		}
+//
+//		output, err = f.appendData(output, expressions)
+//		if err != nil {
+//			break
+//		}
+//
+//	}
+//
+//	return output, err
+//}
 
 func (f *Framework) SortPrefixes(prefixes []Prefix) {
 	sort.Slice(prefixes, func(i, j int) bool {
