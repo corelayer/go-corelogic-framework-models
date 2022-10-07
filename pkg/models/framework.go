@@ -25,7 +25,7 @@ import (
 )
 
 type DataMapWriter interface {
-	AppendData(source map[string]string, destination map[string]string) (map[string]string, error)
+	appendData(source map[string]string, destination map[string]string) (map[string]string, error)
 }
 
 type Framework struct {
@@ -48,7 +48,7 @@ func (f *Framework) GetPrefixWithVersion(sectionName string) string {
 	return strings.Join([]string{f.GetPrefixMap()[sectionName], f.Release.GetVersionAsString()}, "_")
 }
 
-func (f *Framework) appendData(source map[string]string, destination map[string]string) (map[string]string, error) {
+func (f *Framework) appendData(destination map[string]interface{}, source map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 
 	for k, v := range source {
@@ -63,23 +63,23 @@ func (f *Framework) appendData(source map[string]string, destination map[string]
 	return destination, err
 }
 
-func (f *Framework) GetElements() (map[string]string, error) {
+func (f *Framework) GetElements() (map[string]interface{}, error) {
 	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get fields from packages"))
 
-	output := make(map[string]string)
+	output := make(map[string]interface{})
 	var err error
 
 	// Get all fields in all packages
 	for _, p := range f.Packages {
-		var fields map[string]string
+		var elements map[string]interface{}
 
-		fields, err = p.GetElements()
+		elements, err = p.GetElements()
 		if err != nil {
 			log.Fatal(err)
 			//break
 		}
 
-		output, err = f.appendData(fields, output)
+		output, err = f.appendData(output, elements)
 		if err != nil {
 			log.Fatal(err)
 			//break
@@ -88,15 +88,15 @@ func (f *Framework) GetElements() (map[string]string, error) {
 	return output, err
 }
 
-func (f *Framework) GetFields() (map[string]string, error) {
+func (f *Framework) GetFields() (map[string]interface{}, error) {
 	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get fields from packages"))
 
-	output := make(map[string]string)
+	output := make(map[string]interface{})
 	var err error
 
 	// Get all fields in all packages
 	for _, p := range f.Packages {
-		var fields map[string]string
+		var fields map[string]interface{}
 
 		fields, err = p.GetFields()
 		if err != nil {
@@ -104,7 +104,7 @@ func (f *Framework) GetFields() (map[string]string, error) {
 			//break
 		}
 
-		output, err = f.appendData(fields, output)
+		output, err = f.appendData(output, fields)
 		if err != nil {
 			log.Fatal(err)
 			//break
@@ -113,8 +113,8 @@ func (f *Framework) GetFields() (map[string]string, error) {
 	return output, err
 }
 
-func (f *Framework) GetExpressions(kind string, tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
+func (f *Framework) GetExpressions(kind string, tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
 	var err error
 
 	if kind == "install" {
@@ -126,11 +126,11 @@ func (f *Framework) GetExpressions(kind string, tagFilter []string) (map[string]
 	return output, err
 }
 
-func (f *Framework) getInstallExpressions(tagFilter []string) (map[string]string, error) {
+func (f *Framework) getInstallExpressions(tagFilter []string) (map[string]interface{}, error) {
 	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get install expressions from packages"))
 
-	output := make(map[string]string)
-	var expressions map[string]string
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	for _, p := range f.Packages {
@@ -138,18 +138,18 @@ func (f *Framework) getInstallExpressions(tagFilter []string) (map[string]string
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			output, err = f.appendData(expressions, output)
+			output, err = f.appendData(output, expressions)
 		}
 	}
 
 	return output, err
 }
 
-func (f *Framework) getUninstallExpressions(tagFilter []string) (map[string]string, error) {
+func (f *Framework) getUninstallExpressions(tagFilter []string) (map[string]interface{}, error) {
 	//defer general.FinishTimer(general.StartTimer("Framework " + f.Release.GetVersionAsString() + " get uninstall expressions from packages"))
 
-	output := make(map[string]string)
-	var expressions map[string]string
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	for _, p := range f.Packages {
@@ -157,7 +157,7 @@ func (f *Framework) getUninstallExpressions(tagFilter []string) (map[string]stri
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			output, err = f.appendData(expressions, output)
+			output, err = f.appendData(output, expressions)
 		}
 	}
 

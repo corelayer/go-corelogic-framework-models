@@ -34,8 +34,8 @@ func (s *Section) expandSectionPrefix(expression string) string {
 	return strings.ReplaceAll(expression, "prefix", s.Name)
 }
 
-func (s *Section) GetElements(moduleName string) (map[string]string, error) {
-	output := make(map[string]string)
+func (s *Section) GetElements(moduleName string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
 	var err error
 
 	for _, e := range s.Elements {
@@ -45,15 +45,15 @@ func (s *Section) GetElements(moduleName string) (map[string]string, error) {
 			err = fmt.Errorf("duplicate key in fields: %q", elementOutputName)
 			break
 		} else {
-			output[elementOutputName] = e.Name
+			output[elementOutputName] = e
 		}
 	}
 
 	return output, err
 }
 
-func (s *Section) GetFields(moduleName string) (map[string]string, error) {
-	output := make(map[string]string)
+func (s *Section) GetFields(moduleName string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
 	var err error
 
 	for _, e := range s.Elements {
@@ -72,8 +72,8 @@ func (s *Section) GetFields(moduleName string) (map[string]string, error) {
 	return output, err
 }
 
-func (s *Section) GetInstallExpressions(moduleName string, tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
+func (s *Section) GetInstallExpressions(moduleName string, tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
 	var err error
 
 	for _, e := range s.Elements {
@@ -99,8 +99,8 @@ func (s *Section) GetInstallExpressions(moduleName string, tagFilter []string) (
 	return output, err
 }
 
-func (s *Section) GetUninstallExpressions(moduleName string, tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
+func (s *Section) GetUninstallExpressions(moduleName string, tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
 	var err error
 
 	for _, e := range s.Elements {

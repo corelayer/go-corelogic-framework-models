@@ -31,9 +31,9 @@ func (m *Module) GetFullModuleName(packageName string) string {
 	return packageName + "." + m.Name
 }
 
-func (m *Module) GetElements(packageName string) (map[string]string, error) {
-	output := make(map[string]string)
-	var expressions map[string]string
+func (m *Module) GetElements(packageName string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	fullModuleName := m.GetFullModuleName(packageName)
@@ -42,15 +42,15 @@ func (m *Module) GetElements(packageName string) (map[string]string, error) {
 		if err != nil {
 			break
 		} else {
-			output, err = m.AppendData(expressions, output)
+			output, err = m.appendData(output, expressions)
 		}
 	}
 
 	return output, err
 }
-func (m *Module) GetFields(packageName string) (map[string]string, error) {
-	output := make(map[string]string)
-	var expressions map[string]string
+func (m *Module) GetFields(packageName string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	fullModuleName := m.GetFullModuleName(packageName)
@@ -59,16 +59,16 @@ func (m *Module) GetFields(packageName string) (map[string]string, error) {
 		if err != nil {
 			break
 		} else {
-			output, err = m.AppendData(expressions, output)
+			output, err = m.appendData(output, expressions)
 		}
 	}
 
 	return output, err
 }
 
-func (m *Module) GetInstallExpressions(packageName string, tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
-	var expressions map[string]string
+func (m *Module) GetInstallExpressions(packageName string, tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	if !m.HasFilteredTag(tagFilter) {
@@ -79,7 +79,7 @@ func (m *Module) GetInstallExpressions(packageName string, tagFilter []string) (
 			if err != nil {
 				break
 			} else {
-				output, err = m.AppendData(expressions, output)
+				output, err = m.appendData(output, expressions)
 			}
 		}
 	}
@@ -87,9 +87,9 @@ func (m *Module) GetInstallExpressions(packageName string, tagFilter []string) (
 	return output, err
 }
 
-func (m *Module) GetUninstallExpressions(packageName string, tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
-	var expressions map[string]string
+func (m *Module) GetUninstallExpressions(packageName string, tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	if !m.HasFilteredTag(tagFilter) {
@@ -99,7 +99,7 @@ func (m *Module) GetUninstallExpressions(packageName string, tagFilter []string)
 			if err != nil {
 				break
 			} else {
-				output, err = m.AppendData(expressions, output)
+				output, err = m.appendData(output, expressions)
 			}
 		}
 	} else {
@@ -110,7 +110,7 @@ func (m *Module) GetUninstallExpressions(packageName string, tagFilter []string)
 	return output, err
 }
 
-func (m *Module) AppendData(source map[string]string, destination map[string]string) (map[string]string, error) {
+func (m *Module) appendData(destination map[string]interface{}, source map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 
 	for k, v := range source {

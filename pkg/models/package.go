@@ -26,26 +26,26 @@ type Package struct {
 	Modules []Module `yaml:"modules,omitempty"`
 }
 
-func (p *Package) GetElements() (map[string]string, error) {
-	output := make(map[string]string)
-	var fields map[string]string
+func (p *Package) GetElements() (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var elements map[string]interface{}
 	var err error
 
 	for _, m := range p.Modules {
-		fields, err = m.GetElements(p.Name)
+		elements, err = m.GetElements(p.Name)
 		if err != nil {
 			break
 		} else {
-			output, err = p.AppendData(fields, output)
+			output, err = p.appendData(output, elements)
 		}
 	}
 
 	return output, err
 }
 
-func (p *Package) GetFields() (map[string]string, error) {
-	output := make(map[string]string)
-	var fields map[string]string
+func (p *Package) GetFields() (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var fields map[string]interface{}
 	var err error
 
 	for _, m := range p.Modules {
@@ -53,16 +53,16 @@ func (p *Package) GetFields() (map[string]string, error) {
 		if err != nil {
 			break
 		} else {
-			output, err = p.AppendData(fields, output)
+			output, err = p.appendData(output, fields)
 		}
 	}
 
 	return output, err
 }
 
-func (p *Package) GetInstallExpressions(tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
-	var expressions map[string]string
+func (p *Package) GetInstallExpressions(tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	for _, m := range p.Modules {
@@ -70,16 +70,16 @@ func (p *Package) GetInstallExpressions(tagFilter []string) (map[string]string, 
 		if err != nil {
 			break
 		} else {
-			output, err = p.AppendData(expressions, output)
+			output, err = p.appendData(output, expressions)
 		}
 	}
 
 	return output, err
 }
 
-func (p *Package) GetUninstallExpressions(tagFilter []string) (map[string]string, error) {
-	output := make(map[string]string)
-	var expressions map[string]string
+func (p *Package) GetUninstallExpressions(tagFilter []string) (map[string]interface{}, error) {
+	output := make(map[string]interface{})
+	var expressions map[string]interface{}
 	var err error
 
 	for _, m := range p.Modules {
@@ -87,14 +87,14 @@ func (p *Package) GetUninstallExpressions(tagFilter []string) (map[string]string
 		if err != nil {
 			break
 		} else {
-			output, err = p.AppendData(expressions, output)
+			output, err = p.appendData(output, expressions)
 		}
 	}
 
 	return output, err
 }
 
-func (p *Package) AppendData(source map[string]string, destination map[string]string) (map[string]string, error) {
+func (p *Package) appendData(destination map[string]interface{}, source map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 
 	for k, v := range source {
