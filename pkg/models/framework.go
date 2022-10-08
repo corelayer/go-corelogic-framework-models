@@ -40,7 +40,7 @@ func (f *Framework) GetPrefixes() (map[string]Prefix, error) {
 	var err error
 
 	for _, prefix := range f.Prefixes {
-		prefix.Prefix = f.GetPrefixWithVersion(prefix.Section)
+		prefix.Prefix = f.GetPrefixWithVersion(prefix.Prefix)
 		output, err = AppendPrefixes(output, prefix)
 		if err != nil {
 			break
